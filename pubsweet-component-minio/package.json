@@ -1,6 +1,6 @@
 {
   "name": "express-middleware-minio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An Express middleware that helps you upload, list, download and delete Minio files.",
   "keywords": [
     "express",
