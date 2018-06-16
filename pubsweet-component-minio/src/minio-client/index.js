@@ -27,32 +27,32 @@ module.exports = {
     )
   },
 
-  listFiles(username, fragmentId, res) {
-    const { uploads } = minioConfig
+  listFiles(username, fragmentId, callback) {
+    const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
     const prefix = `${username}/${uploads}/${fragmentId}`
-    const stream = minioClient.listObjects(minioConfig.bucket, prefix, true)
+    const stream = minioClient.listObjects(process.env.MINIO_BUCKET, prefix, true)
     const list = []
     stream.on('data', obj => {
       list.push(obj)
     })
     stream.on('error', err => {
-      res.send(err)
+      callback(err)
     })
     stream.on('end', () => {
-      res.send(list)
+      callback(null, list)
     })
   },
 
   getFile(username, fragmentId, fileName, tmpFile, callback) {
-    const { uploads } = minioConfig
+    const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
     const objectName = `${username}/${uploads}/${fragmentId}/${fileName}`
-    minioClient.fGetObject(minioConfig.bucket, objectName, tmpFile, callback)
+    minioClient.fGetObject(process.env.MINIO_BUCKET, objectName, tmpFile, callback)
   },
 
   deleteFile(username, fragmentId, fileName, callback) {
-    const { uploads } = minioConfig
+    const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
     const objectName = `${username}/${uploads}/${fragmentId}/${fileName}`
-    minioClient.removeObject(minioConfig.bucket, objectName, err => {
+    minioClient.removeObject(process.env.MINIO_BUCKET, objectName, err => {
       callback(err)
     })
   },

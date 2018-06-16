@@ -63,6 +63,41 @@ const handlePost = (req, next, fields, files) => {
 	)
 }
 
+const handleList = (req, next, fields, files) => {
+	minioClient.listFiles(
+		req.minioReq.username,
+		req.minioReq.list.folder,
+		(error, list) => {
+			if (error) {
+				req.minioRes = {error}
+				console.log(error)
+			} else {
+				req.minioRes = {list}
+			}
+			next()
+		},
+	)
+}
+
+const handleGet = (req, next, fields, files) => {
+	const tmpFile = `/tmp/${req.minioReq.get.folder}-${req.minioReq.get.file}`
+	minioClient.getFile(
+		req.minioReq.username,
+		req.minioReq.get.folder,
+		req.minioReq.get.file,
+		tmpFile,
+		error => {
+			if (error) {
+				req.minioRes = {error}
+				console.log(error)
+			} else {
+				req.minioRes = {get: tmpFile}
+			}
+			next()
+		},
+	)
+}
+
 const handleRequests = (req, next, options) => {
 	if (!validityCheck(req, options)) {
 		next()
@@ -82,6 +117,10 @@ const handleRequests = (req, next, options) => {
 
 	    if (options.op === Ops.post) {
 	    	handlePost(req, next, fields, files)
+	    } else if (options.op === Ops.list) {
+	    	handleList(req, next, fields, files)
+	    } else if (options.op === Ops.get) {
+	    	handleGet(req, next, fields, files)
 	    }
 	})
 }
