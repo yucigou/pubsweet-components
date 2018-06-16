@@ -28,7 +28,6 @@ const validityCheck = (req, options) => {
 
 	let supported = false;
 	for (const property in Ops) {
-		console.log('property: ', property);
 		if (Ops[property] === options.op) {
 			supported = true
 			break
@@ -44,7 +43,7 @@ const validityCheck = (req, options) => {
 	return true;
 }
 
-const handlePost = (req, fields, files) => {
+const handlePost = (req, next, fields, files) => {
 	minioClient.uploadFile(
 		req.minioReq.username,
 		fields.fragmentId,
@@ -54,32 +53,35 @@ const handlePost = (req, fields, files) => {
 		(error, etag) => {
 			if (error) {
 				req.minioRes = {error}
-				console.log(err)
-				return false;
+				console.log(error)
+			} else {
+				req.minioRes = {post: { id: `${fields.fragmentId}/${files.file.name}` }}
 			}
-			req.minioRes = { id: `${fields.fragmentId}/${files.file.name}` }
-			return true;
+			next()
+			return
 		},
 	)
 }
 
-const handleRequests = (req, options) => {
+const handleRequests = (req, next, options) => {
 	if (!validityCheck(req, options)) {
+		next()
 		return;
 	}
 
 	const form = new formidable.IncomingForm()
-	form.parse(req, (err, fields, files) => {
-		req.minioRes = {error: 'No error'}
+	req.minioRes = {error: 'No error'}
 
+	form.parse(req, (err, fields, files) => {
 	    if (err) {
 			req.minioRes = {error: err}
 			console.log(err)
+			next()
 			return;
 	    }
 
 	    if (options.op === Ops.post) {
-	    	handlePost(req, fields, files)
+	    	handlePost(req, next, fields, files)
 	    }
 	})
 }
@@ -88,9 +90,8 @@ module.exports = {
 	Ops,
 	middleware() {
 		return options => {
-			return async (req, res, next) => {
-				handleRequests(req, options);
-				next()
+			return (req, res, next) => {
+				handleRequests(req, next, options);
 			}
 		}
 	}	
