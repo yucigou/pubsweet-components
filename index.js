@@ -32,6 +32,17 @@ const setupGetFile = (req, res, next) => {
   	next()
 }
 
+const setupDeleteFile = (req, res, next) => {
+  	req.minioReq = {
+  		...req.minioReq,
+		delete: {
+			folder: req.params.fragmentId,
+			file: req.params.fileId
+		}
+	}
+  	next()
+}
+
 app.get('/', (req, res) => {
   res.send('Example to use PubSweet components!')
 })
@@ -65,6 +76,18 @@ app.get('/api/files/:fragmentId/:fileId',
 			res.status(400).json({ error: req.minioRes.error })
 		}
 		res.download(req.minioRes.get);
+	}
+)
+
+app.delete('/api/files/:fragmentId/:fileId',
+	setupLoginUser,
+	setupDeleteFile,
+	minioMiddleware({op: minioClient.Ops.delete}),
+	(req, res) => {
+		if (req.minioRes.error) {
+			res.status(400).json({ error: req.minioRes.error })
+		}
+		res.send(req.minioRes.delete);
 	}
 )
 

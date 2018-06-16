@@ -1,6 +1,6 @@
 require('dotenv').config()
 const formidable = require('formidable')
-const minioClient = require('./src/minio-client')
+const minioClient = require('./minio-client.js')
 
 const Ops = Object.freeze({"post":1, "list":2, "get":3, "delete":4})
 
@@ -98,6 +98,23 @@ const handleGet = (req, next, fields, files) => {
 	)
 }
 
+const handleDelete = (req, next, fields, files) => {
+	minioClient.deleteFile(
+        req.minioReq.username,
+        req.minioReq.delete.folder,
+        req.minioReq.delete.file,
+		error => {
+			if (error) {
+				req.minioRes = {error}
+				console.log(error)
+			} else {
+				req.minioRes = {delete: 'Success'}
+			}
+			next()
+		},
+    )
+}
+
 const handleRequests = (req, next, options) => {
 	if (!validityCheck(req, options)) {
 		next()
@@ -121,6 +138,10 @@ const handleRequests = (req, next, options) => {
 	    	handleList(req, next, fields, files)
 	    } else if (options.op === Ops.get) {
 	    	handleGet(req, next, fields, files)
+	    } else if (options.op === Ops.delete) {
+	    	handleDelete(req, next, fields, files)
+	    } else {
+	    	console.log("Should not be here");
 	    }
 	})
 }

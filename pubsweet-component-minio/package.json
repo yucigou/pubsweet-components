@@ -9,10 +9,8 @@
   "author": "Yuci Gou <yuci.gou@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "config": "^1.30.0",
     "dotenv": "^6.0.0",
     "formidable": "^1.2.1",
-    "lodash": "^4.17.10",
     "minio": "^6.0.0"
   }
 }
