@@ -12,3 +12,17 @@ MINIO_FTP_FOLDER_NAME=ftp
 ```
 
 APIs
+
+```shell
+Upload a file
+POST: /api/files
+
+List a folder
+GET: /api/files/{folder-name}
+
+Download a file
+GET: /api/files/{folder-name}/{file-name}
+
+Delete a file
+DELETE: /api/files/{folder-name}/{file-name}
+```

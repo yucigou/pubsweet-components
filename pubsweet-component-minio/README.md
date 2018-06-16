@@ -1,10 +1,3 @@
-res.minioReq = {
-	username: 'Not null'
-}
+How to use the package (Example)?
 
-res.minioRes = {
-	error: 'Null when no error',
-	post: {
-		id: 'fragment-id/file-name'
-	}
-}
+https://github.com/yucigou/pubsweet-components/blob/master/index.js
