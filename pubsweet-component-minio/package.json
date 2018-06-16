@@ -1,5 +1,5 @@
 {
-  "name": "@pubsweet/component-minio",
+  "name": "express-middleware-minio",
   "version": "1.0.0",
   "description": "A list of endpoints that help you upload, download and delete Minio files.",
   "main": "index.js",
