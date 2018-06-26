@@ -39,7 +39,7 @@ const minioClient = require('express-middleware-minio')
 console.log(minioClient.Ops.post)
 ```
 
-You can find the example [here](https://github.com/yucigou/pubsweet-components/blob/master/index.js) and below is the relevant code snippet.
+You can find the detailed example [here](https://github.com/yucigou/pubsweet-components/blob/master/index.js) and below is the relevant code snippet.
 
 ```javascript
 const minioClient = require('express-middleware-minio')
