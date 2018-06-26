@@ -10,7 +10,9 @@ The Minio middleware also allows you to list all files stored inside the predefi
 
 ## First of all, install the package:
 
-express-middleware-minio
+```shell
+npm i express-middleware-minio
+```
 
 ## Second, you need to add .env to get it up running, e.g.:
 
