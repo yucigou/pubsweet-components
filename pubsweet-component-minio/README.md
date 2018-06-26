@@ -27,6 +27,19 @@ MINIO_UPLOADS_FOLDER_NAME=uploads
 ```
 
 ## Then you can use the Minio middleware in your Express application:
+Four operations are provided:
+* post
+* get
+* delete
+* list
+
+You can use them the following way:
+```javascript
+const minioClient = require('express-middleware-minio')
+console.log(minioClient.Ops.post)
+```
+
+You can find the example [here](https://github.com/yucigou/pubsweet-components/blob/master/index.js) and below is the relevant code snippet.
 
 ```javascript
 const minioClient = require('express-middleware-minio')
@@ -70,5 +83,3 @@ app.delete('/api/files/:filename',
 	}
 )
 ```
-
-You can find the example [here](https://github.com/yucigou/pubsweet-components/blob/master/index.js)
