@@ -8,7 +8,6 @@ MINIO_PORT=9000
 MINIO_SECURITY=false
 MINIO_BUCKET=manuscripts
 MINIO_UPLOADS_FOLDER_NAME=uploads
-MINIO_FTP_FOLDER_NAME=ftp
 ```
 
 APIs
@@ -16,13 +15,14 @@ APIs
 ```shell
 Upload a file
 POST: /api/files
+Return: {"filename":"24383c60-792b-11e8-9f1f-d9194b25e031.pdf"}
 
-List a folder
-GET: /api/files/{folder-name}
+List all files
+GET: /api/files
 
 Download a file
-GET: /api/files/{folder-name}/{file-name}
+GET: /api/files/{filename}
 
 Delete a file
-DELETE: /api/files/{folder-name}/{file-name}
+DELETE: /api/files/{filename}
 ```

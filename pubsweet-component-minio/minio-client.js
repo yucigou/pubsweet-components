@@ -9,13 +9,13 @@ const minioClient = new Minio.Client({
 })
 
 module.exports = {
-  uploadFile(username, fragmentId, fileName, fileType, tempFilePath, callback) {
+  uploadFile(filename, oriFilename, fileType, tempFilePath, callback) {
     const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
-    const filePath = `${username}/${uploads}/${fragmentId}/${fileName}`
+    let filePath = `${uploads}/${filename}`
 
     const metaData = {
       'content-type': fileType,
-      'file-name': fileName,
+      'file-name': oriFilename,
     }
 
     minioClient.fPutObject(
@@ -27,9 +27,9 @@ module.exports = {
     )
   },
 
-  listFiles(username, fragmentId, callback) {
+  listFiles(callback) {
     const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
-    const prefix = `${username}/${uploads}/${fragmentId}`
+    const prefix = `${uploads}`
     const stream = minioClient.listObjects(process.env.MINIO_BUCKET, prefix, true)
     const list = []
     stream.on('data', obj => {
@@ -43,15 +43,15 @@ module.exports = {
     })
   },
 
-  getFile(username, fragmentId, fileName, tmpFile, callback) {
+  getFile(fileName, tmpFile, callback) {
     const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
-    const objectName = `${username}/${uploads}/${fragmentId}/${fileName}`
+    const objectName = `${uploads}/${fileName}`
     minioClient.fGetObject(process.env.MINIO_BUCKET, objectName, tmpFile, callback)
   },
 
-  deleteFile(username, fragmentId, fileName, callback) {
+  deleteFile(fileName, callback) {
     const uploads = process.env.MINIO_UPLOADS_FOLDER_NAME
-    const objectName = `${username}/${uploads}/${fragmentId}/${fileName}`
+    const objectName = `${uploads}/${fileName}`
     minioClient.removeObject(process.env.MINIO_BUCKET, objectName, err => {
       callback(err)
     })

@@ -1,94 +1,49 @@
 const express = require('express')
 const app = express()
 
-// const minioClient = require('./pubsweet-component-minio')
-const minioClient = require('express-middleware-minio')
+const minioClient = require('./pubsweet-component-minio')
+// const minioClient = require('express-middleware-minio')
 const minioMiddleware = minioClient.middleware();
 
-const setupLoginUser = (req, res, next) => {
-  	req.minioReq = {
-		username: 'ygou@ebi.ac.uk'
-	}
-  	next()
-}
-
-const setupListFolder = (req, res, next) => {
-  	req.minioReq = {
-  		...req.minioReq,
-		list: {
-			folder: req.params.fragmentId
-		}
-	}
-  	next()
-}
-
-const setupGetFile = (req, res, next) => {
-  	req.minioReq = {
-  		...req.minioReq,
-		get: {
-			folder: req.params.fragmentId,
-			file: req.params.fileId
-		}
-	}
-  	next()
-}
-
-const setupDeleteFile = (req, res, next) => {
-  	req.minioReq = {
-  		...req.minioReq,
-		delete: {
-			folder: req.params.fragmentId,
-			file: req.params.fileId
-		}
-	}
-  	next()
-}
-
 app.get('/', (req, res) => {
-  res.send('Example to use PubSweet components!')
+  res.send('Example to use PubSweet Minio components!')
 })
 
-app.post('/api/files', setupLoginUser, minioMiddleware({op: minioClient.Ops.post}), (req, res) => {
-	if (req.minioRes.error) {
-		res.status(400).json({ error: req.minioRes.error })
+app.post('/api/files', minioMiddleware({op: minioClient.Ops.post}), (req, res) => {
+	if (req.minio.error) {
+		res.status(400).json({ error: req.minio.error })
 	}
 
-	res.send({ id: req.minioRes.post.id })
+	res.send({ filename: req.minio.post.filename })
 })
 
-app.get('/api/files/:fragmentId',
-	setupLoginUser, 
-	setupListFolder,
+app.get('/api/files',
 	minioMiddleware({op: minioClient.Ops.list}), 
 	(req, res) => {
-		if (req.minioRes.error) {
-			res.status(400).json({ error: req.minioRes.error })
+		if (req.minio.error) {
+			res.status(400).json({ error: req.minio.error })
 		}
-		res.send(req.minioRes.list);
+		res.send(req.minio.list);
 	}
 )
 
-app.get('/api/files/:fragmentId/:fileId',
-	setupLoginUser, 
-	setupGetFile,
+app.get('/api/files/:filename',
 	minioMiddleware({op: minioClient.Ops.get}),
 	(req, res) => {
-		if (req.minioRes.error) {
-			res.status(400).json({ error: req.minioRes.error })
+		if (req.minio.error) {
+			res.status(400).json({ error: req.minio.error })
 		}
-		res.download(req.minioRes.get);
+		res.download(req.minio.get);
 	}
 )
 
-app.delete('/api/files/:fragmentId/:fileId',
-	setupLoginUser,
-	setupDeleteFile,
+app.delete('/api/files/:filename',
 	minioMiddleware({op: minioClient.Ops.delete}),
 	(req, res) => {
-		if (req.minioRes.error) {
-			res.status(400).json({ error: req.minioRes.error })
+		if (req.minio.error) {
+			res.status(400).json({ error: req.minio.error })
 		}
-		res.send(req.minioRes.delete);
+		res.send(req.minio.delete);
 	}
 )
 

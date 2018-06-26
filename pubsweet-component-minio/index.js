@@ -1,27 +1,22 @@
 require('dotenv').config()
 const formidable = require('formidable')
 const minioClient = require('./minio-client.js')
+const uuidv1 = require('uuid/v1')
 
 const Ops = Object.freeze({"post":1, "list":2, "get":3, "delete":4})
 
+const extractFileExtension = filename => {
+  if (filename) {
+    return filename.split('.').pop()
+  }
+
+  return ''
+}
+
 const validityCheck = (req, options) => {
 	if (!options) {
-		const error = 'Options not available'
-		req.minioRes = {error}
-		console.log(error)
-		return false;
-	}
-
-	if (!req.minioReq) {
-		const error = 'req.minioReq not available'
-		req.minioRes = {error}
-		console.log(error)
-		return false;
-	}
-
-	if (!req.minioReq.username) {
-		const error = 'req.minioReq.username not available'
-		req.minioRes = {error}
+		const error = 'Options not provided'
+		req.minio = {error}
 		console.log(error)
 		return false;
 	}
@@ -35,7 +30,7 @@ const validityCheck = (req, options) => {
 	}
 	if (!supported) {
 		const error = 'Operation not supported'
-		req.minioRes = {error}
+		req.minio = {error}
 		console.log(error)
 		return false;
 	}
@@ -44,18 +39,23 @@ const validityCheck = (req, options) => {
 }
 
 const handlePost = (req, next, fields, files) => {
+    let filename = uuidv1()
+    const extension = extractFileExtension(files.file.name)
+    if (extension) {
+    	filename += '.' + extension
+    }
+
 	minioClient.uploadFile(
-		req.minioReq.username,
-		fields.fragmentId,
+		filename,
 		files.file.name,
 		files.file.type,
 		files.file.path,
 		(error, etag) => {
 			if (error) {
-				req.minioRes = {error}
+				req.minio = {error}
 				console.log(error)
 			} else {
-				req.minioRes = {post: { id: `${fields.fragmentId}/${files.file.name}` }}
+				req.minio = {post: { filename: `${filename}` }}
 			}
 			next()
 			return
@@ -65,14 +65,12 @@ const handlePost = (req, next, fields, files) => {
 
 const handleList = (req, next, fields, files) => {
 	minioClient.listFiles(
-		req.minioReq.username,
-		req.minioReq.list.folder,
 		(error, list) => {
 			if (error) {
-				req.minioRes = {error}
+				req.minio = {error}
 				console.log(error)
 			} else {
-				req.minioRes = {list}
+				req.minio = {list}
 			}
 			next()
 		},
@@ -80,18 +78,16 @@ const handleList = (req, next, fields, files) => {
 }
 
 const handleGet = (req, next, fields, files) => {
-	const tmpFile = `/tmp/${req.minioReq.get.folder}-${req.minioReq.get.file}`
+	const tmpFile = `/tmp/${req.params.filename}`
 	minioClient.getFile(
-		req.minioReq.username,
-		req.minioReq.get.folder,
-		req.minioReq.get.file,
+		req.params.filename,
 		tmpFile,
 		error => {
 			if (error) {
-				req.minioRes = {error}
+				req.minio = {error}
 				console.log(error)
 			} else {
-				req.minioRes = {get: tmpFile}
+				req.minio = {get: tmpFile}
 			}
 			next()
 		},
@@ -100,15 +96,13 @@ const handleGet = (req, next, fields, files) => {
 
 const handleDelete = (req, next, fields, files) => {
 	minioClient.deleteFile(
-        req.minioReq.username,
-        req.minioReq.delete.folder,
-        req.minioReq.delete.file,
+        req.params.filename,
 		error => {
 			if (error) {
-				req.minioRes = {error}
+				req.minio = {error}
 				console.log(error)
 			} else {
-				req.minioRes = {delete: 'Success'}
+				req.minio = {delete: 'Success'}
 			}
 			next()
 		},
@@ -122,11 +116,11 @@ const handleRequests = (req, next, options) => {
 	}
 
 	const form = new formidable.IncomingForm()
-	req.minioRes = {error: 'No error'}
+	req.minio = {error: 'No error'}
 
 	form.parse(req, (err, fields, files) => {
 	    if (err) {
-			req.minioRes = {error: err}
+			req.minio = {error: err}
 			console.log(err)
 			next()
 			return;

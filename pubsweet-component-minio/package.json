@@ -16,6 +16,7 @@
   "dependencies": {
     "dotenv": "^6.0.0",
     "formidable": "^1.2.1",
-    "minio": "^6.0.0"
+    "minio": "^6.0.0",
+    "uuid": "^3.2.1"
   }
 }
