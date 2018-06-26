@@ -9,7 +9,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "eslint ."
   },
   "author": "Yuci Gou <yuci.gou@gmail.com>",
@@ -18,11 +18,15 @@
     "dotenv": "^6.0.0",
     "formidable": "^1.2.1",
     "minio": "^6.0.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.3.0"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-plugin-import": "^2.13.0"
+    "eslint": "^5.0.1",
+    "jest": "^23.2.0",
+    "node-mocks-http": "^1.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:yucigou/pubsweet-components.git"
   }
 }

@@ -61,6 +61,7 @@ const handlePost = (req, next, fields, files) => {
 }
 
 const handleList = (req, next) => {
+	console.log('handleList...')
     minioClient.listFiles(
         (error, list) => {
             if (error) {
@@ -104,6 +105,7 @@ const handleDelete = (req, next) => {
 }
 
 const handleRequests = (req, next, options) => {
+	console.log('handleRequests...')
     if (!validityCheck(req, options)) {
         next()
         return
