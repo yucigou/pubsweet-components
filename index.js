@@ -1,8 +1,7 @@
 const express = require('express')
 const app = express()
 
-const minioClient = require('./pubsweet-component-minio')
-// const minioClient = require('express-middleware-minio')
+const minioClient = require('express-middleware-minio')
 const minioMiddleware = minioClient.middleware();
 
 app.get('/', (req, res) => {
