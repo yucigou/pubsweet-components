@@ -16,9 +16,10 @@ APIs
 Upload a file
 POST: /api/files
 Return: {"filename":"24383c60-792b-11e8-9f1f-d9194b25e031.pdf"}
-
+```
 Once a file has been uploaded successfully, you will be informed of the filename known to Minio for this file. Later on, you can use this filename to download or delete the file.
 
+```shell
 Download a file
 GET: /api/files/{filename}
 
