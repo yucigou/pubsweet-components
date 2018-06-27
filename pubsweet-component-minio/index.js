@@ -37,6 +37,8 @@ const validityCheck = (req, options) => {
 }
 
 const handlePost = (req, next, fields, files) => {
+	console.log('handlePost...')
+
     let filename = uuidv1()
     const extension = extractFileExtension(files.file.name)
     if (extension) {
@@ -61,7 +63,7 @@ const handlePost = (req, next, fields, files) => {
 }
 
 const handleList = (req, next) => {
-	console.log('handleList...')
+    console.log('handleList...')
     minioClient.listFiles(
         (error, list) => {
             if (error) {
@@ -91,6 +93,7 @@ const handleGet = (req, next) => {
 }
 
 const handleDelete = (req, next) => {
+	console.log('Deleting ' + req.params.filename)
     minioClient.deleteFile(
         req.params.filename,
         error => {
@@ -105,32 +108,34 @@ const handleDelete = (req, next) => {
 }
 
 const handleRequests = (req, next, options) => {
-	console.log('handleRequests...')
+    console.log('handleRequests...')
     if (!validityCheck(req, options)) {
         next()
         return
     }
+    
+    if (options.op === Ops.post) {
+	    const form = new formidable.IncomingForm()
+	    console.log('form: ', form)
+	    console.log('req: ', req)
+        form.parse(req, (err, fields, files) => {
+        	console.log('form parsed')
 
-    const form = new formidable.IncomingForm()
-    req.minio = {error: 'No error'}
+            if (err) {
+                req.minio = {error: err}
+                next()
+                return
+            }
 
-    form.parse(req, (err, fields, files) => {
-        if (err) {
-            req.minio = {error: err}
-            next()
-            return
-        }
-
-        if (options.op === Ops.post) {
-            handlePost(req, next, fields, files)
-        } else if (options.op === Ops.list) {
-            handleList(req, next)
-        } else if (options.op === Ops.get) {
-            handleGet(req, next)
-        } else if (options.op === Ops.delete) {
-            handleDelete(req, next)
-        }
-    })
+            handlePost(req, next, fields, files)  
+        })
+    } else if (options.op === Ops.list) {
+        handleList(req, next)
+    } else if (options.op === Ops.get) {
+        handleGet(req, next)
+    } else if (options.op === Ops.delete) {
+        handleDelete(req, next)
+    }
 }
 
 module.exports = {
